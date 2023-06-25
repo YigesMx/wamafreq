@@ -1,6 +1,14 @@
-# Frequency Domain Watermark Playground
+# Frequency Domain Watermark Playground 频域水印实验室
 
 ## 环境部署
+
+### 0. 创建虚拟环境
+
+```bash
+conda create -n watermark
+conda activate watermark
+conda install pip
+```
 
 ### 1. 安装依赖
 

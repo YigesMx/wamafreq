@@ -62,8 +62,8 @@ def show_images(images: list, titles: list, n: int, m: int, font_scale: float = 
             plt.title(titles[i * n + j])
     plt.show()
 
-def center_log_spectrum(spectrum: np.ndarray):
+def center_log_spectrum(input: np.ndarray):
     """ 对数化、归一化、* 255 """
-    spectrum = np.log(np.abs(spectrum) + 1)
+    spectrum = np.log(np.abs(input) + 1)
     spectrum = (spectrum - np.min(spectrum)) * 255 // (np.max(spectrum) - np.min(spectrum))
     return np.uint8(spectrum)

@@ -9,7 +9,7 @@ def matrix_power_mod(matrix: np.ndarray, power: int, mod: np.ndarray):
 		result = np.matmul(result, matrix) % mod
 	return result
 
-def arnold(img, n):
+def arnold(img: np.ndarray, n: int):
 	img = np.array(img)
 	h, w, c = img.shape
 	new_img = np.zeros((h, w, c), dtype=np.uint8)
@@ -22,7 +22,7 @@ def arnold(img, n):
 			new_img[new_x, new_y] = img[x, y]
 	return new_img
 
-def get_arnold_reverse(L):
+def get_arnold_reverse(L: int):
 	_matrix = np.array([[2, 1], [1, 1]])
 	matrix = _matrix.copy()
 	cnt = 1
@@ -31,7 +31,7 @@ def get_arnold_reverse(L):
 		cnt += 1
 	return cnt
 
-def arnold_reverse(img, n):
+def arnold_reverse(img: np.ndarray, n: int):
 	nn = get_arnold_reverse(img.shape[0])
 	reversed_img = arnold(img, nn - n)
 	return reversed_img

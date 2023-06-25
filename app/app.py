@@ -108,6 +108,10 @@ def wm_fft(image_ori_input: np.ndarray, watermark_text: str):
 
 def iwm_fft(image_wm_input: np.ndarray):
     img_wm_fft = wama_fft.rgb_fft2(image_wm_input)
+    if ENABLE_ARNOLD[0]:
+        iarnold = arnold.arnold_reverse(utility.center_log_spectrum(img_wm_fft), ARNOLD_N[0])
+    else:
+        iarnold = utility.center_log_spectrum(img_wm_fft)
 
     # 提取 CROP 范围内的频谱
     crop_width = int(TAMPER_LOCATE_CROP[0] * min(img_wm_fft.shape[0], img_wm_fft.shape[1]))
@@ -116,10 +120,10 @@ def iwm_fft(image_wm_input: np.ndarray):
 
     # 逆变换
     img_tamper_locate = wama_fft.rgb_ifft2(img_wm_fft_crop) * 64
-    return utility.center_log_spectrum(img_wm_fft), utility.center_log_spectrum(img_wm_fft_crop), img_tamper_locate
+    return utility.center_log_spectrum(img_wm_fft), iarnold, utility.center_log_spectrum(img_wm_fft_crop), img_tamper_locate
 
 
-def wm_dct(image_ori_input: np.ndarray, watermark_text: str):
+def wm_dct(image_ori_input: np.ndarray):
     image_ori = np.uint8(image_ori_input.copy())
     block_size = (image_ori.shape[0] // BLOCKS[0][0], image_ori.shape[1] // BLOCKS[0][1])
     wm_ori = wama_dct.get_feature(image_ori, BLOCKS[0])
@@ -251,14 +255,17 @@ with gr.Blocks() as app:
                     gr.Markdown("### 水印显示与篡改信息提取")
                     with gr.Row():
                         image_wm_fft_show = gr.Image(label = "水印图像频域 (DFT)")
-                        water_wm_window_show = gr.Image(label = "篡改定位信息窗")
+                        iarnold_show = gr.Image(label = "逆 Arnold 猫变换")
+
                     gr.Markdown("### 篡改定位显示")
-                    image_tamper_locate_show = gr.Image(label = "原图频域 + 水印 (DFT)")
+                    with gr.Row():
+                        water_wm_window_show = gr.Image(label = "篡改定位信息窗")
+                        image_tamper_locate_show = gr.Image(label = "篡改定位 (IDFT)")
 
         config_button.click(config_handler, inputs=[wm_alpha, tl_crop, en_arn, arnold_n], outputs=[config_msg])
 
         wm_fft_button.click(wm_fft, inputs=[image_ori_input, watermark_text], outputs=[before_arn_show, after_arn_show, image_fft_show, water_mark_show, image_fft_wm_show, image_wm_show])
-        iwm_fft_button.click(iwm_fft, inputs=[image_wm_input], outputs=[image_wm_fft_show, water_wm_window_show, image_tamper_locate_show])
+        iwm_fft_button.click(iwm_fft, inputs=[image_wm_input], outputs=[image_wm_fft_show, iarnold_show, water_wm_window_show, image_tamper_locate_show])
 
         fft_crop_button.click(crop_handler, inputs=[image_process_crop_input], outputs=[image_process_show, image_process_msg])
         fft_sketch_button.click(sketch_handler, inputs=[image_process_sketch_input, skecth_color], outputs=[image_process_show, image_process_msg])
@@ -356,7 +363,7 @@ with gr.Blocks() as app:
         dct_rotate_button.click(rotate_handler, inputs=[image_process_rotate_input, rotate_angle], outputs=[image_process_show, image_process_msg])
         dct_blur_button.click(blur_handler, inputs=[image_process_blur_input, blur_radius], outputs=[image_process_show, image_process_msg])
 
-    with gr.Tab("Arnold 猫变换"):
+    with gr.Tab("(供调试) Arnold 猫变换"):
 
         with gr.Accordion("Arnold 全局参数", open = False):
 
