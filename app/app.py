@@ -355,7 +355,7 @@ with gr.Blocks() as app:
 
         config_button.click(dct_config_handler, inputs=[blocks_x, blocks_y], outputs=[config_msg])
 
-        wm_dct_button.click(wm_dct, inputs=[image_ori_input, watermark_text], outputs=[water_mark_show, image_wm_show])
+        wm_dct_button.click(wm_dct, inputs=[image_ori_input], outputs=[water_mark_show, image_wm_show])
         iwm_dct_button.click(iwm_dct, inputs=[image_wm_input], outputs=[image_wm_dct_show, water_wm_window_show, image_tamper_locate_show])
 
         dct_crop_button.click(crop_handler, inputs=[image_process_crop_input], outputs=[image_process_show, image_process_msg])
